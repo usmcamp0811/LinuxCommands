@@ -1,0 +1,32 @@
+#remove OpenJDK
+
+sudo apt-get purge openjdk*
+
+#add digital key
+
+sudo apt-key adv –recv-key –keyserver keyserver.ubuntu.com EEA14886
+
+#add packet source
+
+sudo vim /etc/apt/sources.list
+
+#add following lines
+
+deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
+deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
+
+#install Java 8
+
+sudo apt-get update
+sudo apt-get install oracle-java8-installer
+sudo apt-get install oracle-java8-set-default
+
+#remove old Java
+
+sudo apt-get purge openjdk*
+sudo apt-get purge java7*
+sudo apt-get autoremove
+
+#check success
+
+java -version

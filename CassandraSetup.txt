@@ -1,0 +1,64 @@
+# make sure java is installed 1.8 is current at this time
+
+# install JNA
+sudo apt-get install libjna-java
+
+# Download Cassandra
+
+# for Ubuntu
+echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
+sudo apt-key adv --keyserver pool.sks-keyservers.net --recv-key A278B781FE4B2BDA
+sudo apt-get update
+sudo apt-get install cassandra
+
+# for Raspberry Pi
+wget http://www.apache.org/dyn/closer.lua/cassandra/3.11.0/apache-cassandra-3.11.0-bin.tar.gz
+tar -xzf apache-cassandra-3.11.0-bin.tar.gz
+mv /apache-cassandra-3.11.0 /cassandra
+
+sudo nano /etc/security/limits.conf
+
+# add the following:
+# cassandra soft memlock unlimited
+# cassandra hard memlock unlimited
+
+nano cassandra.yaml
+
+# make edits
+# cluster_name: 'CampCluster1'
+# num_tokens: 256
+# NOTE: if a node is a lesser system set num_tokens to something less than 256
+
+sudo su
+mkdir /var/lib/cassandra && chown cassandra.cassandra /var/lib/cassandra && mkdir /var/log/cassandra && chown cassandra.cassandra /var/log/cassandra
+
+# for starting over... or changing stuff
+rm -rf /var/lib/cassandra && rm -rf /var/log/cassandra
+
+
+ls -ld /var/lib/cassandra /var/log/cassandra/
+
+
+# Set permissions for deb install
+sudo chown -R cassandra:cassandra /var/lib/cassandra/data
+sudo chown -R cassandra:cassandra /var/lib/cassandra/commitlog
+sudo chown -R cassandra:cassandra /var/lib/cassandra/
+sudo chown -R cassandra:cassandra /var/log/cassandra
+
+#
+# Configuring Cassandra without root permissions
+
+# Before performing this steps, you must have completed steps 1 and 2 in Installing from the binary tarball.
+
+#Procedure
+
+# In the install directory, create the data and log directories:
+mkdir cassandra-data; cd cassandra-data
+mkdir data saved_caches commitlog
+# Edit the cassandra.yaml file:
+cd path_to_install/conf/
+# Edit these settings:
+data_file_directories: path_to_install/cassandra-data/data
+commitlog_directory: path_to_install/cassandra-data/commitlog
+saved_caches_directory: path_to_install/cassandra-data/saved_caches

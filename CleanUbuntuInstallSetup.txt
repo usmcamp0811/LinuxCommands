@@ -1,0 +1,123 @@
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install guake
+
+# install Chrome
+sudo apt-get install libxss1 libappindicator1 libindicator7
+cd /Downloads
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo dpkg -i google-chrome*.deb
+
+# install Cinnamon-desktop
+sudo apt-get install cinnamon-desktop-environment
+
+# install Terminator
+sudo apt-get install terminator
+
+# install Nvidia Drivers
+# crt-alt-F1
+sudo add-apt-repository ppa:graphics-drivers/ppa
+sudo apt-get update
+sudo apt-get install nvidia-381
+
+
+# install sublime
+sudo add-apt-repository ppa:webupd8team/sublime-text-3
+sudo apt-get update
+sudo apt-get install sublime-text-installer
+
+# install ssh
+sudo apt-get install ssh
+
+# install Python/Anaconda
+cd /Downloads
+wget https://repo.continuum.io/archive/Anaconda3-4.4.0-Linux-x86_64.sh
+bash Anaconda3-4.4.0-Linux-x86_64.sh
+source ~/.bashrc
+
+# install Jupyterhub
+sudo apt-get install npm nodejs-legacy
+sudo npm install -g configurable-http-proxy
+pip install jupyterhub
+# sudo ufw allow 8000/tcp
+# TODO: Make setup instructions
+sudo mkdir /srv/jupyterhub
+sudo openssl rand -base64 2048 > /srv/jupyterhub/cookie_secret
+# set permissions on cookie_secret to only be read only by mcamp
+
+# install PIA
+cd /Downloads
+#GOTO: https://www.privateinternetaccess.com/installer/download_installer_linux
+tar -xzf pia-v70-installer-linux.tar.gz
+./pia-v70-installer-linux.sh
+
+# install Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get update
+sudo apt-get install -y docker-ce
+sudo usermod -aG docker ${USER}
+
+# install R
+sudo echo "deb http://cran.rstudio.com/bin/linux/ubuntu xenial/" | sudo tee -a /etc/apt/sources.list
+gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9
+gpg -a --export E084DAB9 | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install r-base r-base-dev
+
+# install R Studio
+cd /Downloads
+sudo apt-get install gdebi-core
+wget https://download1.rstudio.org/rstudio-0.99.896-amd64.deb
+sudo gdebi -n rstudio-0.99.896-amd64.deb
+rm rstudio-0.99.896-amd64.deb
+
+# install Java
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt update; sudo apt install oracle-java8-installer
+javac -version
+sudo apt install oracle-java8-set-default
+
+# install Scala Jupyter Kernel
+cd /home/mcamp/jupyterhub
+git clone https://github.com/alexarchambault/jupyter-scala.git
+
+echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
+sudo apt-get update
+sudo apt-get install sbt
+
+cd jupyter-scala
+sbt cli/packArchive
+./jupyter-scala
+
+# install Skype
+cd Downloads
+wget https://go.skype.com/skypeforlinux-64.deb
+sudo dpkg -i skypeforlinux-64.deb
+
+# install pycharm https://www.jetbrains.com/pycharm/download/download-thanks.html?platform=linux
+sudo tar xfz pycharm-professional-*.tar.gz -C /opt/
+
+
+# install virtual box
+sudo nano /etc/apt/sources.list
+#####################add############################################
+deb http://download.virtualbox.org/virtualbox/debian xenial contrib
+#################################################################
+wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install virtualbox-5.1
+
+
+## Setting keyboard to run at startup as root
+sudo nano /etc/init.d/rc.local
+
+#For Laptops.. disable sleep with lid closed
+sudoedit /etc/UPower/UPower.conf
+# change IgnoreLid=false
+
+sudo add-apt-repository ppa:danielrichter2007/grub-customizer
+sudo apt-get update
+sudo apt-get install grub-customizer

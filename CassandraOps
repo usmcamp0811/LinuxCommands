@@ -1,0 +1,12 @@
+# on Ubuntu or full Linux just
+cassandra
+
+# on Raspberry Pis
+cd cassandra/cassandra/bin
+./cassandra
+
+# to check node status
+nodetool status
+
+# Cassandra terminal
+cqlsh

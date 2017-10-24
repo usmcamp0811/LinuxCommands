@@ -1,0 +1,32 @@
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep x11 | sed s/install//`
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep python | sed s/install//`
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep sound | sed s/install//`
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep gnome | sed s/install//`
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep lxde | sed s/install//`
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep gtk | sed s/install//`
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep desktop | sed s/install//`
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep gstreamer | sed s/install//`
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep avahi | sed s/install//`
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep dbus | sed s/install//`
+ sudo apt-get -y remove `sudo dpkg --get-selections | grep -v "deinstall" | grep freetype | sed s/install//`
+ sudo apt-get -y autoremove
+ sudo apt-get clean
+
+ sudo sed -i 's/wheezy/jessie/' /etc/apt/sources.list
+ sudo sed -i 's/wheezy/jessie/' /etc/apt/sources.list.d/raspi.list
+ sudo apt-get update && sudo apt-get -y upgrade # answer 'y' to upcoming questions
+ sudo apt-get -y dist-upgrade # answer 'y' to upcoming questions
+ sudo init 6
+ sudo apt-get -y autoremove
+ sudo apt-get -y purge (dpkg -l | awk '/^rc/ { print 2 }')
+ sudo init 6
+
+ git clone https://github.com/hypriot/rpi-docker-builder.git
+ cd rpi-docker-builder
+ sudo sh build.sh
+ sudo sh run-builder.sh
+
+ curl -ks https://packagecloud.io/install/repositories/Hypriot/Schatzkiste/script.deb.sh | sudo bash
+ sudo apt-get install docker-hypriot=1.10.3-1
+ sudo sh -c 'usermod -aG docker SUDO_USER'
+ sudo systemctl enable docker.service

@@ -1,0 +1,110 @@
+# Spark Installation
+
+# Install Scala
+sudo apt-get install scala
+
+# Download Spark	
+wget https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.7.tgz
+
+sudo tar -xvf spark-2.1.1-bin-hadoop2.7.tgz -C /opt
+sudo ln -s spark-2.1.1-bin-hadoop2.7 spark
+
+
+sudo nano /etc/bash.bashrc
+# Add the following to ~/.bashrc on Master Node
+############################################################################
+export SPARK_HOME=/opt/spark
+export PATH=$SPARK_HOME/bin
+###########################################################################
+source ~/.bashrc
+
+cd $SPARK_HOME/conf/
+sudo cp spark-env.sh.template spark-env.sh
+sudo nano spark-env.sh
+# Add the following to spark-env.sh
+############################################################################
+export SPARK_MASTER_IP=Palehorse6
+# export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+# export SPARK_YARN_QUEUE=dev
+export SPARK_WORKER_MEMORY=512m
+export SPARK_EXECUTOR_INSTANCES=2
+export SPARK_WORKER_DIR=/opt/spark-2.1.1-bin-hadoop2.7/data
+export SCALA_HOME=/usr/bin/scala
+############################################################################
+
+# (copy the slaves.template file to another file named as slaves)
+sudo cp slaves.template slaves
+sudo nano slaves
+
+# Add all the nodes
+
+sudo nano spark-defaults.conf.template
+
+# Uncomment out the spark.master line... adjust the ip/url to the master ip/url
+
+# Getting PySpark running
+# Add the following to ~/.bashrc on Master Node
+############################################################################
+export PYTHONPATH=$SPARK_HOME/python/:$PYTHONPATH
+############################################################################
+source ~/.bashrc
+
+pip install py4j
+sudo apt-get install -y python-setuptools
+sudo apt-get install pandoc
+cd /opt/spark/python
+python setup.py install
+
+/opt/spark-2.1.1-bin-hadoop2.7/bin/spark-submit --master yarn --executor-memory 512m --name wordcount --executor-cores 8 /home/hduser/wordCount.py home/hduser/PridePrejudice.txt
+
+
+
+
+
+
+./bin/spark-submit --class org.apache.spark.examples.SparkPi \
+    --master yarn \
+    --deploy-mode cluster \
+    --driver-memory 4g \
+    --executor-memory 2g \
+    --executor-cores 1 \
+    --queue thequeue \
+    lib/spark-examples*.jar \
+    10
+
+
+
+# SPARK + CASSANDRA
+
+# build spark cassandra connector
+echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 642AC823
+sudo apt-get install apt-transport-https -y
+sudo apt-get update -y
+sudo apt-get install sbt -y
+git clone https://github.com/datastax/spark-cassandra-connector.git
+cd spark-cassandra-connector
+git checkout v2.0.0-M2
+sudo sbt assembly -Dscala-2.11=true
+
+# OR JUST GET THE JAR!
+https://spark-packages.org/package/datastax/spark-cassandra-connector
+
+import com.datastax.spark.connector._, org.apache.spark.SparkContext, org.apache.spark.SparkContext._, org.apache.spark.SparkConf
+val conf = new SparkConf(true).set("spark.cassandra.connection.host", "192.168.0.106")
+val sc = new SparkContext(conf)
+
+
+$SPARK_HOME/bin/spark-shell --conf spark.cassandra.connection.host=192.168.0.106 \
+                            --packages datastax:spark-cassandra-connector:2.0.1-s_2.11
+
+
+spark.read.format("org.apache.spark.sql.cassandra").options(table="satobs", space="spacefront").load().show()
+
+val cassandraRDD = ssc.cassandraTable("spacefront", "satobs").select("target_id", "jd").where("target_id = ?", "28884")
+
+
+# loading data from cassandra with spark... maybe 
+import org.apache.spark.SparkConf
+
+val conf = new SparkConf(true).set("spark.cassandra.connection.host", "192.168.0.106").set("spark.cassandra.auth.username", "cassandra").set("spark.cassandra.auth.password", "feg049")

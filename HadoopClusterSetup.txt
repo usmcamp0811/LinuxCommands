@@ -1,0 +1,270 @@
+PiCamp0 = 200 #New Pi
+PiCamp1 = 201 #GrageDoor Pi
+#################################################################
+sudo nano /etc/hosts
+# For ease of understanding add 192.168.0.200  PiCamp0 to the hosts
+
+
+sudo su
+nano /etc/dhcpcd.conf
+
+#################################################################
+# Paste into dhcpcd.conf
+# Don't think its necesarry though cause I already assigned
+# static ips on the router
+#################################################################
+interface wlan0
+static ip_address=192.168.0.200/24
+# static ip_address=192.168.0.201/24
+# static ip_address=192.168.0.112/24
+static routers=192.168.0.1
+static domain_name_servers=123.123.123.123 123.123.123.123
+##################################################################
+
+
+# NOTE: set pass to ****
+sudo addgroup hadoop
+sudo adduser --ingroup hadoop hduser
+sudo adduser hduser sudo
+
+
+sudo apt-get install maven libssl-dev build-essential pkgconf cmake
+cd ~/
+# wget http://www-us.apache.org/dist/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
+wget http://apache.claz.org/hadoop/common/hadoop-2.8.0/hadoop-2.8.0.tar.gz
+sudo mkdir /opt
+# sudo tar -xvzf hadoop-2.7.2.tar.gz -C /opt/
+sudo tar -xvzf hadoop-2.8.0.tar.gz -C /opt/
+cd /opt
+# sudo mv hadoop-2.7.3 hadoop
+sudo mv hadoop-2.8.0 hadoop
+sudo chown -R hduser:hadoop hadoop
+
+sudo nano /etc/bash.bashrc
+
+##################################################################
+# Add to the end of /etc/bash.bashrc the following export lines
+export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+export HADOOP_HOME=/opt/hadoop
+export HADOOP_INSTALL=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export PATH=$PATH:$HADOOP_INSTALL/bin
+##################################################################
+
+source ~/.bashrc
+
+sudo nano /opt/hadoop/etc/hadoop/hadoop-env.sh
+
+##################################################################
+# Hadoop environment variables, uncomment/update the two export lines
+export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+export HADOOP_HEAPSIZE=250
+##################################################################
+
+# Open the file and enter the following in between
+# the <configuration></configuration> tag:
+sudo nano -c /opt/hadoop/etc/hadoop/core-site.xml
+
+###################################################################
+# Master & Slave Node(s)
+###################################################################
+<configuration>
+<property>
+  <name>fs.default.name</name>
+  <value>hdfs://PiCamp0:54310</value>
+  <description>The name of the default file system.  A URI whose
+  scheme and authority determine the FileSystem implementation.  The
+  uri's scheme determines the config property (fs.SCHEME.impl) naming
+  the FileSystem implementation class.  The uri's authority is used to
+  determine the host, port, etc. for a filesystem.</description>
+</property>
+</configuration>
+###################################################################
+
+
+# Note: This is where we'll tell MapReduce to use the YARN framework.
+# The file doesn't exist so you'll need to make a copy from mapred-site.template.xml and edit it
+
+sudo cp /opt/hadoop/etc/hadoop/mapred-site.xml.template /opt/hadoop/etc/hadoop/mapred-site.xml
+sudo nano -c /opt/hadoop/etc/hadoop/mapred-site.xml
+###################################################################
+# Master & Slave Node(s)
+###################################################################
+<configuration>
+<property>
+  <name>mapred.job.tracker</name>
+    <value>PiCamp0:54311</value>
+      <description> The host and port that the MapReduce job tracker runs at.  If "local", then jobs are run in-process as a single map and reduce task.
+      </description>
+</property>
+<property>
+<name>mapreduce.framework.name</name>
+   <value>yarn</value>
+</property>
+
+</configuration>
+
+# Open hdfs-site.xml file and enter the following
+# content in between the <configuration></configuration> tag:
+
+sudo nano /opt/hadoop/etc/hadoop/hdfs-site.xml
+###################################################################
+# Master & Slave Node(s)
+###################################################################
+<configuration>
+
+<property>
+  <name>dfs.replication</name>
+  <value>2</value>
+  <description>Default block replication.
+  The actual number of replications can be specified when the file is created.
+  The default is used if replication is not specified in create time.
+  </description>
+</property>
+
+<!-- This is points to a directory on the computers filesystem to store
+namenode image and datanode blocks.. else when you reboot you have to
+reformat hdfs each time. -->
+<property>
+  <name>dfs.name.dir</name>
+  <value>file:///home/hduser/pseudo/dfs/name</value>
+</property>
+<property>
+  <name>dfs.data.dir</name>
+  <value>file:///home/hduser/pseudo/dfs/data</value>
+</property>
+
+</configuration>
+###################################################################
+
+
+# Open hdfs-site.xml file and enter the following
+# content in between the <configuration></configuration> tag:
+
+sudo nano /opt/hadoop/etc/hadoop/yarn-site.xml
+
+###################################################################
+# Master & Slave Node(s)
+###################################################################
+ <configuration>
+	<property>
+		<name>yarn.nodemanager.aux-services</name>
+		<value>mapreduce_shuffle</value>
+	</property>
+	<property>
+		<name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+		<value>org.apache.hadoop.mapred.ShuffleHandler</value>
+	</property>
+	<property>
+		<name>yarn.resourcemanager.hostname</name>
+		<value>PiCamp0</value>
+	</property>
+	<property>
+		<name>yarn.resourcemanager.resource-tracker.address</name>
+		<value>PiCamp0:8025</value>
+	</property>
+	<property>
+		<name>yarn.resourcemanager.scheduler.address</name>
+		<value>PiCamp0:8030</value>
+	</property>
+	<property>
+		<name>yarn.resourcemanager.address</name>
+		<value>PiCamp0:8050</value>
+	</property>
+</configuration>
+###################################################################
+
+sudo mkdir -p /opt/hadoop/hadoop_data/hdfs/namenode
+sudo mkdir -p /opt/hadoop/hadoop_data/hdfs/datanode
+sudo chown hduser:hadoop /opt/hadoop/hadoop_data/hdfs -R
+sudo chmod 750 /opt/hadoop/hadoop_data/hdfs
+
+cd $HADOOP_INSTALL
+hdfs namenode -format
+
+# NOTE: Not needed but done anyway...
+# sudo apt-get update && sudo apt-get install oracle-java7-jdk
+# sudo apt-get install autoconf automake libtool curl make g++ unzip git
+
+# Create SSH paris keys with blank password.
+# This will enable nodes to communicate with each other in the cluster.
+# NOTE: Maybe also make the ssh key as root. FML!
+su hduser
+mkdir ~/.ssh
+ssh-keygen -t rsa -P "" # press enter don't name it anything
+cat ~/.ssh/id_rsa.pub > ~/.ssh/authorized_keys
+
+
+sudo mkdir /opt/hadoop_store/hdfs/namenode
+cd $HADOOP_HOME/sbin
+./start-dfs.sh
+./start-yarn.sh
+jps #(to view all running services)
+# Should see:
+# 2169 Jps
+# 1232 NameNode
+# 1310 SecondaryNameNode
+# 1350 DataNode
+# 1863 NodeManager
+# 1750 ResourceManager
+
+# Note: Don't think this absolutly needed but it will cause an warning/error if you don't
+# It starts the jobhistory server
+cd /opt/hadoop/sbin/
+./mr-jobhistory-daemon.sh start historyserver
+
+# TEST
+# Run a Hadoop provided example, pi, which calculates the value of pi
+./hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.8.0.jar pi 16 1000
+
+# Copy the file,check HDFS for the file then run wordCount on the file
+hdfs dfs -copyFromLocal /opt/hadoop/LICENSE.txt /license.txt
+hdfs dfs -ls /
+cd /opt/hadoop/bin
+./hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.2.jar wordcount /license.txt /license-out.txt
+
+
+# Create backup-image
+dd if=/dev/sdx of=/path/to/image
+# or
+dd if=/dev/sdx | gzip > /path/to/image.gz
+
+# Restore backup-image
+dd if=/path/to/image of=/dev/sdx
+# or
+gzip -dc /path/to/image.gz | dd of=/dev/sdx
+
+
+# cmds to copy and paste for quickly stoping & starting hdfs
+cd $HADOOP_HOME/sbin
+./stop-dfs.sh && ./stop-yarn.sh && ./mr-jobhistory-daemon.sh stop historyserver
+jps
+cd $HADOOP_HOME/sbin && ./start-dfs.sh && ./start-yarn.sh && ./mr-jobhistory-daemon.sh start historyserver
+hdfs dfsadmin -report
+
+
+# Note: Had a big problem getting the slave node to be recognized.
+# The master node would start the slave node as it should but when
+# viewed in the Web UI and also attempting to check the status view report cmd
+# a failure to connect error would occur. Seemed to be able to fix the problem
+# by running the following lines to delete and recreat the datanode and namenode
+# folders... only took 3 days... :-\
+# DO THIS TO BOTH & MAYBE REBOOT
+cd $HADOOP_HOME/sbin && ./stop-dfs.sh && ./stop-yarn.sh && ./mr-jobhistory-daemon.sh stop historyserver
+rm -rf /opt/hadoop/hadoop_data
+rm -rf /home/hduser/pseudo
+# (not required for nodes 2 and 3)
+sudo mkdir -p /opt/hadoop/hadoop_data/hdfs/namenode
+sudo mkdir -p /opt/hadoop/hadoop_data/hdfs/datanode
+sudo chown hduser:hadoop /opt/hadoop/hadoop_data/hdfs -R
+sudo chmod 750 /opt/hadoop/hadoop_data/hdfs
+sudo reboot
+# ON MASTER
+cd $HADOOP_INSTALL
+hdfs namenode -format
+cd $HADOOP_HOME/sbin && ./start-dfs.sh && ./start-yarn.sh && ./mr-jobhistory-daemon.sh start historyserver
+
+# References:
+# https://medium.com/@jasonicarter/how-to-hadoop-at-home-with-raspberry-pi-part-3-7d114d35fdf1
+# https://www.edureka.co/blog/setting-up-a-multi-node-cluster-in-hadoop-2.X
+# http://blog.ditullio.fr/2015/10/24/mini-cluster-part-iii-hadoop-spark-installation/#Installing_Spark

@@ -1,0 +1,20 @@
+## Remove Old Kernels In Ubuntu With One Command ##
+# Step 1) List all packages that start with "linux-"
+dpkg -l linux-*
+
+# Step 2) Filter that list to show only installed packages
+dpkg -l linux-* | awk '/^ii/{ print $2 }'
+
+# Step 3) Filter out packages for the currently running kernel
+uname -r | cut -f1,2 -d"-"
+
+
+# Step 4) Filter the list for only the kernel packages
+dpkg -l linux-* | awk '/^ii/{ print $2}' | grep -v -e `uname -r | cut -f1,2 -d"-"` | grep -e [0-9]
+
+# Step 5) Make sure we don't catch any stray packages
+dpkg -l linux-* | awk '/^ii/{ print $2}' | grep -v -e `uname -r | cut -f1,2 -d"-"` | grep -e [0-9] | grep -E "(image|headers)"
+
+# Step 6) Putting it all together: Removing the packages
+dpkg -l linux-* | awk '/^ii/{ print $2}' | grep -v -e `uname -r | cut -f1,2 -d"-"` | grep -e [0-9] | grep -E "(image|headers)" | xargs sudo apt-get -y purge
+

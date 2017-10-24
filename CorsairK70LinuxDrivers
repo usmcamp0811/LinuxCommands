@@ -1,0 +1,11 @@
+sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev
+sudo apt-get install qt-sdk
+git clone https://github.com/mattanger/ckb-next.git
+
+
+# make a backup
+sudo cp /etc/init.d/rc.local /etc/init.d/rc.local.backup
+
+sudo crontab -e
+# add to bottom
+@reboot /home/mcamp/ckb-next/bin/ckb-daemon

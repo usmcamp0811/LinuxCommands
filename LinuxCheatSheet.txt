@@ -1,0 +1,15 @@
+# List all drives
+sudo fdisk -l
+# mount drive
+sudo mkdir /media/<name of drive>
+sudo mount -t auto -v /dev/sdX1 /media/<name of drive>
+
+# Path example
+PATH=$PATH\:/home/cassandra/cassandra/cassandra/ ; export PATH
+#
+#Change user group of folder
+sudo chown -Rv <username> /path/to/dir
+
+# add to bottom of .bashrc
+sudo atom ~/.bashrc
+export PATH="/path/to/program/you/want/to/run:$PATH"

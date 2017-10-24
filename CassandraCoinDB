@@ -1,0 +1,15 @@
+CREATE KEYSPACE CryptoCoinDB WITH REPLICATION = {'class':'NetworkTopologyStrategy','campground-wireless':1,'campground-wired':2};
+
+CREATE TABLE CryptoCoinDB.WorldCoinIndex(
+Label          text,
+Name           text,
+Price_btc     double,
+Price_cny     double,
+Price_eur     double,
+Price_gbp     double,
+Price_rur     double,
+Price_usd     double,
+Timestamp       int,
+Volume_24h    double,
+PRIMARY KEY (Name, Timestamp)
+);

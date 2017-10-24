@@ -1,0 +1,20 @@
+## Initial Setup of RaspberryPi
+
+sudo raspi-config
+# go to interface options and enable SSH
+sudo adduser <username> sudo
+su <username>
+sudo systemctl stop autologin@tty1
+sudo systemctl daemon-reload
+sudo deluser --remove-home pi
+
+
+sudo nano vipw
+#Change/Add 
+# root::0:0:root:/root:/bin/bash
+sudo reboot
+sudo passwd root
+
+# miniconda
+wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
+bash Miniconda3-latest-Linux-armv7l.sh
