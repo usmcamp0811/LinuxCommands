@@ -1,15 +1,395 @@
-CREATE KEYSPACE CryptoCoinDB WITH REPLICATION = {'class':'NetworkTopologyStrategy','campground-wireless':1,'campground-wired':2};
+cqlsh:cryptocoindb> describe cryptocoindb
 
-CREATE TABLE CryptoCoinDB.WorldCoinIndex(
-Label          text,
-Name           text,
-Price_btc     double,
-Price_cny     double,
-Price_eur     double,
-Price_gbp     double,
-Price_rur     double,
-Price_usd     double,
-Timestamp       int,
-Volume_24h    double,
-PRIMARY KEY (Name, Timestamp)
-);
+CREATE KEYSPACE cryptocoindb WITH replication = {'class': 'NetworkTopologyStrategy', 'campground-wired': '2', 'campground-wireless': '2', 'datacenter1': '1'}  AND durable_writes = true;
+
+CREATE TABLE cryptocoindb.traiding_pairs (
+    date text,
+    timestamp timestamp,
+    id text,
+    coin1a text,
+    best_market text,
+    coin1 text,
+    coin2 text,
+    coin2a text,
+    latest_trade text,
+    price float,
+    price_before_24h float,
+    volume_btc float,
+    volume_first float,
+    volume_second float,
+    PRIMARY KEY (date, timestamp, id, coin1a)
+) WITH CLUSTERING ORDER BY (timestamp DESC, id ASC, coin1a ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.transactions (
+    name text,
+    transaction_date text,
+    transaction_time text,
+    coins_transacted float,
+    price_at_transaction float,
+    PRIMARY KEY ((name, transaction_date), transaction_time)
+) WITH CLUSTERING ORDER BY (transaction_time ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.tblprice (
+    coin text,
+    timestamp double,
+    currency text,
+    price double,
+    PRIMARY KEY (coin, timestamp)
+) WITH CLUSTERING ORDER BY (timestamp ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.coinlist (
+    id int,
+    coinname text,
+    algorithm text,
+    fullname text,
+    fullypremined int,
+    imageurl text,
+    name text,
+    preminedvalue float,
+    prooftype text,
+    sortorder int,
+    totalcoinsfreefloat float,
+    totalcoinsmined float,
+    totalcoinsupply float,
+    url text,
+    PRIMARY KEY (id, coinname)
+) WITH CLUSTERING ORDER BY (coinname ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.bittrex_market_summary (
+    marketname text,
+    timestamp text,
+    ask float,
+    basevolume float,
+    bid float,
+    created text,
+    high float,
+    last float,
+    low float,
+    openbuyorders int,
+    opensellorders int,
+    prevday float,
+    volume float,
+    PRIMARY KEY (marketname, timestamp)
+) WITH CLUSTERING ORDER BY (timestamp ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.snapshot_error_log (
+    timestamp float PRIMARY KEY,
+    coin text,
+    message text,
+    response text,
+    type int
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.worldcoinindex (
+    date text,
+    name text,
+    timestamp timestamp,
+    label text,
+    price_btc double,
+    price_cny double,
+    price_eur double,
+    price_gbp double,
+    price_rur double,
+    price_usd double,
+    volume_24h double,
+    PRIMARY KEY (date, name, timestamp)
+) WITH CLUSTERING ORDER BY (name ASC, timestamp DESC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.worldcoinindex_test (
+    date text,
+    timestamp timestamp,
+    name text,
+    label text,
+    price_btc double,
+    price_cny double,
+    price_eur double,
+    price_gbp double,
+    price_rur double,
+    price_usd double,
+    volume_24h double,
+    PRIMARY KEY (date, timestamp, name)
+) WITH CLUSTERING ORDER BY (timestamp DESC, name ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.aggregated_data (
+    timestamp float,
+    fromsymbol text,
+    algorithm text,
+    blocknumber int,
+    blockreward float,
+    flags text,
+    high24hour text,
+    lastmarket text,
+    lasttradeid text,
+    lastupdate text,
+    lastvolume text,
+    lastvolumeto text,
+    low24hour text,
+    market text,
+    nethashespersecond float,
+    open24hour text,
+    price text,
+    prooftype text,
+    tosymbol text,
+    totalcoinsmined float,
+    type text,
+    volume24hour text,
+    volume24hourto text,
+    PRIMARY KEY (timestamp, fromsymbol)
+) WITH CLUSTERING ORDER BY (fromsymbol ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.exchanges (
+    timestamp float,
+    fromsymbol text,
+    lasttradeid text,
+    market text,
+    flags text,
+    high24hour text,
+    lastupdate text,
+    lastvolume text,
+    lastvolumeto text,
+    low24hour text,
+    open24hour text,
+    price text,
+    tosymbol text,
+    type text,
+    volume24hour text,
+    volume24hourto text,
+    PRIMARY KEY (timestamp, fromsymbol, lasttradeid, market)
+) WITH CLUSTERING ORDER BY (fromsymbol ASC, lasttradeid ASC, market ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.coinlist_cccharts (
+    id text,
+    date text,
+    timestamp float,
+    name text,
+    price_btc float,
+    volume_btc float,
+    website text,
+    PRIMARY KEY ((id, date), timestamp)
+) WITH CLUSTERING ORDER BY (timestamp DESC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.wallet_history (
+    txid text PRIMARY KEY,
+    amount_coin text,
+    balance float,
+    balance_coin text,
+    cbase_to text,
+    coin_price_at_transaction float,
+    coin_transferfee float,
+    coinamount float,
+    coinbaseid text,
+    exchange float,
+    fee_coin text,
+    instantlyexchanged boolean,
+    notes text,
+    orderbtc float,
+    ordercurrency float,
+    ordercustomparameter float,
+    orderpaidout float,
+    orderprice float,
+    ordertrackingcode float,
+    recurringpaymentid float,
+    timestamp text,
+    transferfee float,
+    transferfeecurrency text,
+    transferid text,
+    transferpaymentmethod text,
+    transfertotal float,
+    transfertotal_usd float,
+    transfertotalcurrency text,
+    txurl text,
+    walletname text
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+CREATE TABLE cryptocoindb.cc_coinlist (
+    id text,
+    date text,
+    timestamp float,
+    name text,
+    price_btc float,
+    volume_btc float,
+    website text,
+    PRIMARY KEY ((id, date), timestamp)
+) WITH CLUSTERING ORDER BY (timestamp DESC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+

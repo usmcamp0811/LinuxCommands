@@ -35,6 +35,7 @@ In tmux, hit the prefix `ctrl+b` (my modified prefix is ctrl+a) and then:
     :new<CR>  new session
     s  list sessions
     $  name session
+    d  detach session
 
 ## <a name="WindowsTabs"></a>Windows (tabs)
 
@@ -54,7 +55,7 @@ In tmux, hit the prefix `ctrl+b` (my modified prefix is ctrl+a) and then:
     o  swap panes
     q  show pane numbers
     x  kill pane
-    +  break pane into window (e.g. to select text by mouse to copy)
+    +  break pane into window (e.g. to select text by mo4Luy4HZZpg8luse to copy)
     -  restore pane from window
     ⍽  space - toggle between layouts
     <prefix> q (Show pane numbers, when the numbers show up type the key to goto that pane)
