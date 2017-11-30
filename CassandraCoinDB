@@ -1,8 +1,6 @@
-cqlsh:cryptocoindb> describe cryptocoindb
+CREATE KEYSPACE cryptocoindb2 WITH replication = {'class': 'NetworkTopologyStrategy', 'campground-wired': '2', 'campground-wireless': '2', 'datacenter1': '1'}  AND durable_writes = true;
 
-CREATE KEYSPACE cryptocoindb WITH replication = {'class': 'NetworkTopologyStrategy', 'campground-wired': '2', 'campground-wireless': '2', 'datacenter1': '1'}  AND durable_writes = true;
-
-CREATE TABLE cryptocoindb.traiding_pairs (
+CREATE TABLE cryptocoindb2.traiding_pairs (
     date text,
     timestamp timestamp,
     id text,
@@ -34,7 +32,7 @@ CREATE TABLE cryptocoindb.traiding_pairs (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.transactions (
+CREATE TABLE cryptocoindb2.transactions (
     name text,
     transaction_date text,
     transaction_time text,
@@ -57,7 +55,7 @@ CREATE TABLE cryptocoindb.transactions (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.tblprice (
+CREATE TABLE cryptocoindb2.tblprice (
     coin text,
     timestamp double,
     currency text,
@@ -79,7 +77,7 @@ CREATE TABLE cryptocoindb.tblprice (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.coinlist (
+CREATE TABLE cryptocoindb2.coinlist (
     id int,
     coinname text,
     algorithm text,
@@ -111,7 +109,7 @@ CREATE TABLE cryptocoindb.coinlist (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.bittrex_market_summary (
+CREATE TABLE cryptocoindb2.bittrex_market_summary (
     marketname text,
     timestamp text,
     ask float,
@@ -142,7 +140,7 @@ CREATE TABLE cryptocoindb.bittrex_market_summary (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.snapshot_error_log (
+CREATE TABLE cryptocoindb2.snapshot_error_log (
     timestamp float PRIMARY KEY,
     coin text,
     message text,
@@ -163,7 +161,7 @@ CREATE TABLE cryptocoindb.snapshot_error_log (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.worldcoinindex (
+CREATE TABLE cryptocoindb2.worldcoinindex (
     date text,
     name text,
     timestamp timestamp,
@@ -192,7 +190,7 @@ CREATE TABLE cryptocoindb.worldcoinindex (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.worldcoinindex_test (
+CREATE TABLE cryptocoindb2.worldcoinindex_test (
     date text,
     timestamp timestamp,
     name text,
@@ -221,7 +219,7 @@ CREATE TABLE cryptocoindb.worldcoinindex_test (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.aggregated_data (
+CREATE TABLE cryptocoindb2.aggregated_data (
     timestamp float,
     fromsymbol text,
     algorithm text,
@@ -262,7 +260,7 @@ CREATE TABLE cryptocoindb.aggregated_data (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.exchanges (
+CREATE TABLE cryptocoindb2.exchanges (
     timestamp float,
     fromsymbol text,
     lasttradeid text,
@@ -296,7 +294,7 @@ CREATE TABLE cryptocoindb.exchanges (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.coinlist_cccharts (
+CREATE TABLE cryptocoindb2.coinlist_cccharts (
     id text,
     date text,
     timestamp float,
@@ -321,7 +319,7 @@ CREATE TABLE cryptocoindb.coinlist_cccharts (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.wallet_history (
+CREATE TABLE cryptocoindb2.wallet_history (
     txid text PRIMARY KEY,
     amount_coin text,
     balance float,
@@ -367,7 +365,7 @@ CREATE TABLE cryptocoindb.wallet_history (
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
 
-CREATE TABLE cryptocoindb.cc_coinlist (
+CREATE TABLE cryptocoindb2.cc_coinlist (
     id text,
     date text,
     timestamp float,
@@ -391,5 +389,3 @@ CREATE TABLE cryptocoindb.cc_coinlist (
     AND min_index_interval = 128
     AND read_repair_chance = 0.0
     AND speculative_retry = '99PERCENTILE';
-
-

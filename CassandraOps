@@ -10,3 +10,217 @@ nodetool status
 
 # Cassandra terminal
 cqlsh
+
+# for bulk export of data
+
+COPY cryptocoindb.traiding_pairs (
+    date ,
+    timestamp ,
+    id ,
+    coin1a ,
+    best_market ,
+    coin1 ,
+    coin2 ,
+    coin2a ,
+    latest_trade ,
+    price ,
+    price_before_24h ,
+    volume_btc ,
+    volume_first ,
+    volume_second)
+TO 'trading_pairs.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.transactions (
+    name ,
+    transaction_date ,
+    transaction_time ,
+    coins_transacted ,
+    price_at_transaction)
+TO 'transactions.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.tblprice (
+    coin ,
+    timestamp ,
+    currency ,
+    price )
+TO 'tblprice.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.coinlist (
+    id ,
+    coinname ,
+    algorithm ,
+    fullname ,
+    fullypremined ,
+    imageurl ,
+    name ,
+    preminedvalue ,
+    prooftype ,
+    sortorder ,
+    totalcoinsfreefloat ,
+    totalcoinsmined ,
+    totalcoinsupply ,
+    url )
+TO 'coinlist.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.bittrex_market_summary (
+    marketname ,
+    timestamp ,
+    ask ,
+    basevolume ,
+    bid ,
+    created ,
+    high ,
+    last ,
+    low ,
+    openbuyorders ,
+    opensellorders ,
+    prevday ,
+    volume )
+TO 'bittrex_market_summary.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.snapshot_error_log (
+    timestamp ,
+    coin ,
+    message ,
+    response ,
+    type )
+TO 'snapshot_error_log.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.worldcoinindex (
+    date ,
+    name ,
+    timestamp ,
+    label ,
+    price_btc ,
+    price_cny ,
+    price_eur ,
+    price_gbp ,
+    price_rur ,
+    price_usd ,
+    volume_24h )
+TO 'worldcoinindex.csv'
+WITH PAGETIMEOUT=100 AND PAGESIZE=30;
+
+COPY cryptocoindb.worldcoinindex_test (
+    date ,
+    timestamp ,
+    name ,
+    label ,
+    price_btc ,
+    price_cny ,
+    price_eur ,
+    price_gbp ,
+    price_rur ,
+    price_usd ,
+    volume_24h )
+TO 'worldcoinindex_test.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.aggregated_data (
+    timestamp ,
+    fromsymbol ,
+    algorithm ,
+    blocknumber ,
+    blockreward ,
+    flags ,
+    high24hour ,
+    lastmarket ,
+    lasttradeid ,
+    lastupdate ,
+    lastvolume ,
+    lastvolumeto ,
+    low24hour ,
+    market ,
+    nethashespersecond ,
+    open24hour ,
+    price ,
+    prooftype ,
+    tosymbol ,
+    totalcoinsmined ,
+    type ,
+    volume24hour ,
+    volume24hourto )
+TO 'aggregated_data.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.exchanges (
+    timestamp ,
+    fromsymbol ,
+    lasttradeid ,
+    market ,
+    flags ,
+    high24hour ,
+    lastupdate ,
+    lastvolume ,
+    lastvolumeto ,
+    low24hour ,
+    open24hour ,
+    price ,
+    tosymbol ,
+    type ,
+    volume24hour ,
+    volume24hourto )
+TO 'exchanges.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.coinlist_cccharts (
+    id ,
+    date ,
+    timestamp ,
+    name ,
+    price_btc ,
+    volume_btc ,
+    website )
+TO 'coinlist_cccharts.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.wallet_history (
+    txid,
+    amount_coin ,
+    balance ,
+    balance_coin ,
+    cbase_to ,
+    coin_price_at_transaction ,
+    coin_transferfee ,
+    coinamount ,
+    coinbaseid ,
+    exchange ,
+    fee_coin ,
+    instantlyexchanged ,
+    notes ,
+    orderbtc ,
+    ordercurrency ,
+    ordercustomparameter ,
+    orderpaidout ,
+    orderprice ,
+    ordertrackingcode ,
+    recurringpaymentid ,
+    timestamp ,
+    transferfee ,
+    transferfeecurrency ,
+    transferid ,
+    transferpaymentmethod ,
+    transfertotal ,
+    transfertotal_usd ,
+    transfertotalcurrency ,
+    txurl ,
+    walletname )
+TO 'wallet_history.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
+
+COPY cryptocoindb.cc_coinlist (
+    id ,
+    date ,
+    timestamp ,
+    name ,
+    price_btc ,
+    volume_btc ,
+    website )
+TO 'cc_coinlist.csv'
+WITH PAGETIMEOUT=40 AND PAGESIZE=20;
